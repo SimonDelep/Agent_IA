@@ -1,5 +1,8 @@
 Objectif -> Coder le rag pour le 22 mai 2026
-    -> 
+    -> faire la présentation de NordTrail Gear
+    -> Chopper des clés api azure dev ops (simon)
+    -> Faire des pdf pour alimenter notre base de données 
+    -> Définir les questions auquelle on veut répondre 
 
 
 
