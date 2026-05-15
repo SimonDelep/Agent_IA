@@ -1,18 +1,12 @@
-# Secrets
+dev.env
 .env
 .env.*
 !.env.example
 
-# Python
 __pycache__/
 *.pyc
 .venv/
 venv/
 
-# ChromaDB
 db/
 chroma_db/
-
-# IDE
-.vscode/
-.idea/
