@@ -4,6 +4,7 @@ Charge les variables d'environnement depuis un fichier .env
 """
 
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv(".env")
