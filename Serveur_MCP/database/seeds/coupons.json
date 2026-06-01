@@ -1,0 +1,50 @@
+[
+  {
+    "code": "TRAIL20",
+    "description": "20% de rabais sur commande trail (min. 150 CAD)",
+    "discount_percent": 20.0,
+    "discount_fixed": null,
+    "min_order_amount": 150.0,
+    "valid_from": "2026-01-01",
+    "valid_until": "2026-12-31",
+    "applies_to_sale": 0,
+    "loyalty_required": null,
+    "is_active": 1
+  },
+  {
+    "code": "SUMMIT10",
+    "description": "10 CAD de rabais fixe (expire)",
+    "discount_percent": null,
+    "discount_fixed": 10.0,
+    "min_order_amount": 50.0,
+    "valid_from": "2025-01-01",
+    "valid_until": "2025-12-31",
+    "applies_to_sale": 0,
+    "loyalty_required": null,
+    "is_active": 0
+  },
+  {
+    "code": "VIP15",
+    "description": "15% reserve aux membres gold",
+    "discount_percent": 15.0,
+    "discount_fixed": null,
+    "min_order_amount": 100.0,
+    "valid_from": "2026-01-01",
+    "valid_until": "2026-12-31",
+    "applies_to_sale": 1,
+    "loyalty_required": "gold",
+    "is_active": 1
+  },
+  {
+    "code": "SPRING25",
+    "description": "25 CAD rabais printemps trail",
+    "discount_percent": null,
+    "discount_fixed": 25.0,
+    "min_order_amount": 120.0,
+    "valid_from": "2026-03-01",
+    "valid_until": "2026-06-30",
+    "applies_to_sale": 0,
+    "loyalty_required": null,
+    "is_active": 1
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "warehouse_id": "WH-MTL",
+    "name": "Entrepot NordTrail Montreal",
+    "city": "Montreal",
+    "province": "QC",
+    "country": "CA",
+    "is_active": 1
+  },
+  {
+    "warehouse_id": "WH-QC",
+    "name": "Entrepot NordTrail Quebec",
+    "city": "Quebec",
+    "province": "QC",
+    "country": "CA",
+    "is_active": 1
+  },
+  {
+    "warehouse_id": "WH-YVR",
+    "name": "Entrepot NordTrail Vancouver",
+    "city": "Vancouver",
+    "province": "BC",
+    "country": "CA",
+    "is_active": 1
+  }
+]

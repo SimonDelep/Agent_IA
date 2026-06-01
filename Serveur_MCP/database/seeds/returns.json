@@ -1,0 +1,46 @@
+[
+  {
+    "return_id": "RET-2026-001",
+    "order_id": "NTG-2026-000205",
+    "product_id": "NTG-LAMP-001",
+    "reason": "defaut_batterie",
+    "status": "pending",
+    "requested_at": "2026-05-15",
+    "resolved_at": null,
+    "refund_amount": null,
+    "notes": "LED clignote; charge ne tient pas 30 min."
+  },
+  {
+    "return_id": "RET-2026-002",
+    "order_id": "NTG-2026-000201",
+    "product_id": "NTG-SHOE-001",
+    "reason": "inconfort_taille",
+    "status": "pending",
+    "requested_at": "2026-05-25",
+    "resolved_at": null,
+    "refund_amount": null,
+    "notes": "Client souhaite echange EU 43 au lieu de 42."
+  },
+  {
+    "return_id": "RET-2025-089",
+    "order_id": "NTG-2026-000212",
+    "product_id": "NTG-SLEEP-001",
+    "reason": "hors_delai",
+    "status": "rejected",
+    "requested_at": "2026-01-05",
+    "resolved_at": "2026-01-08",
+    "refund_amount": 0.0,
+    "notes": "Demande refusee; fenetre 30 jours depassee."
+  },
+  {
+    "return_id": "RET-2025-076",
+    "order_id": "NTG-2026-000210",
+    "product_id": "NTG-SHOE-001",
+    "reason": "usure_normale",
+    "status": "rejected",
+    "requested_at": "2026-02-01",
+    "resolved_at": "2026-02-03",
+    "refund_amount": 0.0,
+    "notes": "Semelle usee apres 400 km; non couvert garantie."
+  }
+]

@@ -1,0 +1,17 @@
+product_id,name,category,price,currency,available_sizes,colors,warranty_months,weight_g,recommended_use,waterproof,return_eligible,notes
+NTG-SHOE-001,TrailStorm X2,chaussures_trail,179.99,CAD,EU 40;EU 41;EU 42;EU 43;EU 44;EU 45;EU 46,noir;bleu nuit;vert foret,24,620,trail court et moyen;sentiers techniques,non,1,Prevoir 0.5 a 1 cm devant les orteils.
+NTG-SHOE-002,AlpineTrek Pro Mid GTX,chaussures_randonnee,259.99,CAD,EU 39;EU 40;EU 41;EU 42;EU 43;EU 44;EU 45;EU 46;EU 47,marron;noir;gris roche,24,1120,randonnee longue;terrain humide;montagne,oui,1,Demi-pointure au-dessus pour trek charge.
+NTG-SHOE-003,PeakRush Ultra 5,chaussures_trail,219.99,CAD,EU 38;EU 39;EU 40;EU 41;EU 42;EU 43;EU 44;EU 45,orange brule;noir,18,480,ultra-trail;competition,non,1,Semelle aggressive; usage intensif.
+NTG-JKT-001,RainShield 3L Jacket,veste_impermeable,289.99,CAD,XS;S;M;L;XL;XXL,noir;rouge brique;bleu glacier,36,410,randonnee;pluie;vent,oui,1,Une taille au-dessus si sous-couches epaisses.
+NTG-JKT-002,FrostPeak Down Jacket,doudoune,329.99,CAD,S;M;L;XL;XXL,noir;vert sapin;bleu nuit,36,520,bivouac;froid sec;campement,deperlant,1,Ne pas laver a haute temperature.
+NTG-JKT-003,WindCut Trail Vest,gilet_trail,119.99,CAD,S;M;L;XL,noir;gris;jaune citron,24,185,trail;course;couches legeres,deperlant,1,Range dans le sac a dos.
+NTG-BAG-001,SummitCarry 35,sac_a_dos,189.99,CAD,S/M;M/L,gris;vert foret;orange brule,36,1280,randonnee journee;bivouac leger,non,1,Housse de pluie incluse.
+NTG-BAG-002,ExpeditionPack 60,sac_a_dos,269.99,CAD,M/L;L/XL,noir;gris roche,36,2150,trek plusieurs jours;portage lourd,non,1,Recommande pour charges 12 kg+.
+NTG-BAG-003,HydroStride 12,veste_hydratation,89.99,CAD,S/M;M/L;L/XL,noir;bleu,12,320,trail;course;hydratation rapide,non,1,Reservoir 2L compatible.
+NTG-LAMP-001,LumaTrail USB-C 450,lampe_frontale,79.99,CAD,unique,noir,24,88,trail nocturne;randonnee;bivouac,IPX5,1,Recharge USB-C; cable inclus.
+NTG-SLEEP-001,NordSleep 0C,sac_de_couchage,209.99,CAD,regular;long,bleu nuit;vert foret,24,1180,bivouac printemps;automne doux,non,1,Confort 0C; eviter compression prolongee.
+NTG-GLOVE-001,IceGrip Thermal Gloves,gants,59.99,CAD,XS;S;M;L;XL;XXL,noir,12,120,hiver;randonnee froide;raquettes,deperlant,1,Ne pas choisir trop serre.
+NTG-POLE-001,CarbonStep Trek Poles,batons_randonnee,119.99,CAD,reglable 105-135 cm,noir;gris,24,480,randonnee;trek;descente,non applicable,1,Vendus par paire.
+NTG-SOCK-001,MerinoTrail Pro,socks_trail,34.99,CAD,S;M;L,gris;noir;vert,6,65,trail;randonnee;anti-ampoules,non,1,Merino 72%; sechage rapide.
+NTG-HAT-001,StormBrim Cap,casquette,29.99,CAD,unique,noir;beige;vert,6,95,soleil;pluie legere,deperlant,1,Visiere rigide anti-UV.
+NTG-TENT-001,RidgeLite 2,tente,449.99,CAD,unique,vert;orange,36,2100,bivouac 2 places;vent modere,oui,1,Montage rapide; double paroi.

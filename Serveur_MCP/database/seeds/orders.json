@@ -1,0 +1,262 @@
+[
+  {
+    "order_id": "NTG-2026-000201",
+    "client_id": "CL-004",
+    "status": "livree",
+    "order_date": "2026-04-15",
+    "payment_status": "paye",
+    "shipping_province": "ON",
+    "shipping_method": "standard",
+    "tracking_number": "CPC-9482017741",
+    "delivery_date": "2026-04-22",
+    "subtotal_amount": 179.99,
+    "shipping_amount": 12.99,
+    "tax_amount": 25.09,
+    "total_amount": 218.07,
+    "currency": "CAD",
+    "return_window_end": "2026-05-22",
+    "notes": "Client signale gene aux pieds apres 2 sorties trail.",
+    "items": [
+      {"product_id": "NTG-SHOE-001", "size": "EU 42", "quantity": 1, "unit_price": 179.99}
+    ]
+  },
+  {
+    "order_id": "NTG-2026-000202",
+    "client_id": "CL-002",
+    "status": "expediee",
+    "order_date": "2026-05-10",
+    "payment_status": "paye",
+    "shipping_province": "QC",
+    "shipping_method": "express",
+    "tracking_number": "CPC-7745201188",
+    "delivery_date": null,
+    "subtotal_amount": 289.99,
+    "shipping_amount": 19.99,
+    "tax_amount": 46.49,
+    "total_amount": 356.47,
+    "currency": "CAD",
+    "return_window_end": null,
+    "notes": "Remise au transporteur; livraison express 2-3 jours ouvrables.",
+    "items": [
+      {"product_id": "NTG-JKT-001", "size": "M", "quantity": 1, "unit_price": 289.99}
+    ]
+  },
+  {
+    "order_id": "NTG-2026-000203",
+    "client_id": "CL-003",
+    "status": "en_preparation",
+    "order_date": "2026-05-28",
+    "payment_status": "paye",
+    "shipping_province": "BC",
+    "shipping_method": "standard",
+    "tracking_number": null,
+    "delivery_date": null,
+    "subtotal_amount": 209.96,
+    "shipping_amount": 0.00,
+    "tax_amount": 27.29,
+    "total_amount": 237.25,
+    "currency": "CAD",
+    "return_window_end": null,
+    "notes": "Annulation possible tant que le colis n'est pas expedie.",
+    "items": [
+      {"product_id": "NTG-LAMP-001", "size": "unique", "quantity": 1, "unit_price": 79.99},
+      {"product_id": "NTG-GLOVE-001", "size": "L", "quantity": 1, "unit_price": 59.99},
+      {"product_id": "NTG-SOCK-001", "size": "M", "quantity": 2, "unit_price": 34.99}
+    ]
+  },
+  {
+    "order_id": "NTG-2026-000204",
+    "client_id": "CL-009",
+    "status": "annulee",
+    "order_date": "2026-05-05",
+    "payment_status": "rembourse",
+    "shipping_province": "MB",
+    "shipping_method": "standard",
+    "tracking_number": null,
+    "delivery_date": null,
+    "subtotal_amount": 269.99,
+    "shipping_amount": 14.99,
+    "tax_amount": 37.05,
+    "total_amount": 322.03,
+    "currency": "CAD",
+    "return_window_end": null,
+    "notes": "Annulee a la demande du client avant expedition.",
+    "items": [
+      {"product_id": "NTG-BAG-002", "size": "M/L", "quantity": 1, "unit_price": 269.99}
+    ]
+  },
+  {
+    "order_id": "NTG-2026-000205",
+    "client_id": "CL-010",
+    "status": "retour_demande",
+    "order_date": "2026-03-20",
+    "payment_status": "paye",
+    "shipping_province": "QC",
+    "shipping_method": "standard",
+    "tracking_number": "CPC-3312058890",
+    "delivery_date": "2026-03-27",
+    "subtotal_amount": 79.99,
+    "shipping_amount": 9.99,
+    "tax_amount": 11.69,
+    "total_amount": 101.67,
+    "currency": "CAD",
+    "return_window_end": "2026-04-26",
+    "notes": "Lampe ne tient plus la charge; retour en cours.",
+    "items": [
+      {"product_id": "NTG-LAMP-001", "size": "unique", "quantity": 1, "unit_price": 79.99}
+    ]
+  },
+  {
+    "order_id": "NTG-2026-000206",
+    "client_id": "CL-001",
+    "status": "livree",
+    "order_date": "2026-02-10",
+    "payment_status": "paye",
+    "shipping_province": "QC",
+    "shipping_method": "standard",
+    "tracking_number": "CPC-8821045561",
+    "delivery_date": "2026-02-17",
+    "subtotal_amount": 454.96,
+    "shipping_amount": 0.00,
+    "tax_amount": 59.14,
+    "total_amount": 514.10,
+    "currency": "CAD",
+    "return_window_end": "2026-03-17",
+    "notes": "Fenetre de retour expiree.",
+    "items": [
+      {"product_id": "NTG-BAG-002", "size": "L/XL", "quantity": 1, "unit_price": 269.99},
+      {"product_id": "NTG-POLE-001", "size": "reglable 105-135 cm", "quantity": 1, "unit_price": 119.99},
+      {"product_id": "NTG-HAT-001", "size": "unique", "quantity": 1, "unit_price": 29.99},
+      {"product_id": "NTG-SOCK-001", "size": "L", "quantity": 1, "unit_price": 34.99}
+    ]
+  },
+  {
+    "order_id": "NTG-2026-000207",
+    "client_id": "CL-007",
+    "status": "livree",
+    "order_date": "2026-05-18",
+    "payment_status": "paye",
+    "shipping_province": "AB",
+    "shipping_method": "express",
+    "tracking_number": "CPC-9901872345",
+    "delivery_date": "2026-05-22",
+    "subtotal_amount": 339.98,
+    "shipping_amount": 24.99,
+    "tax_amount": 47.54,
+    "total_amount": 412.51,
+    "currency": "CAD",
+    "return_window_end": "2026-06-21",
+    "notes": "Ultra-trail Banff; client satisfait.",
+    "items": [
+      {"product_id": "NTG-SHOE-003", "size": "EU 41", "quantity": 1, "unit_price": 219.99},
+      {"product_id": "NTG-JKT-003", "size": "M", "quantity": 1, "unit_price": 119.99}
+    ]
+  },
+  {
+    "order_id": "NTG-2026-000208",
+    "client_id": "CL-008",
+    "status": "en_attente",
+    "order_date": "2026-05-30",
+    "payment_status": "autorise",
+    "shipping_province": "QC",
+    "shipping_method": "standard",
+    "tracking_number": null,
+    "delivery_date": null,
+    "subtotal_amount": 449.99,
+    "shipping_amount": 0.00,
+    "tax_amount": 58.50,
+    "total_amount": 508.49,
+    "currency": "CAD",
+    "return_window_end": null,
+    "notes": "Premiere commande; paiement en attente de capture.",
+    "items": [
+      {"product_id": "NTG-TENT-001", "size": "unique", "quantity": 1, "unit_price": 449.99}
+    ]
+  },
+  {
+    "order_id": "NTG-2026-000209",
+    "client_id": "CL-005",
+    "status": "expediee",
+    "order_date": "2026-05-25",
+    "payment_status": "paye",
+    "shipping_province": "NS",
+    "shipping_method": "express",
+    "tracking_number": "CPC-4452019901",
+    "delivery_date": null,
+    "subtotal_amount": 329.99,
+    "shipping_amount": 22.99,
+    "tax_amount": 45.89,
+    "total_amount": 398.87,
+    "currency": "CAD",
+    "return_window_end": null,
+    "notes": "Doudoune FrostPeak; expedition depuis WH-MTL.",
+    "items": [
+      {"product_id": "NTG-JKT-002", "size": "S", "quantity": 1, "unit_price": 329.99}
+    ]
+  },
+  {
+    "order_id": "NTG-2026-000210",
+    "client_id": "CL-006",
+    "status": "livree",
+    "order_date": "2026-01-12",
+    "payment_status": "paye",
+    "shipping_province": "QC",
+    "shipping_method": "standard",
+    "tracking_number": "CPC-1120983344",
+    "delivery_date": "2026-01-19",
+    "subtotal_amount": 179.99,
+    "shipping_amount": 9.99,
+    "tax_amount": 24.67,
+    "total_amount": 214.65,
+    "currency": "CAD",
+    "return_window_end": "2026-02-18",
+    "notes": "Client a historique de retours; verifier eligibilite.",
+    "items": [
+      {"product_id": "NTG-SHOE-001", "size": "EU 44", "quantity": 1, "unit_price": 179.99}
+    ]
+  },
+  {
+    "order_id": "NTG-2026-000211",
+    "client_id": "CL-012",
+    "status": "livree",
+    "order_date": "2026-05-02",
+    "payment_status": "paye",
+    "shipping_province": "QC",
+    "shipping_method": "standard",
+    "tracking_number": "CPC-6678120045",
+    "delivery_date": "2026-05-08",
+    "subtotal_amount": 539.97,
+    "shipping_amount": 0.00,
+    "tax_amount": 70.20,
+    "total_amount": 547.98,
+    "currency": "CAD",
+    "return_window_end": "2026-06-07",
+    "notes": "Commande VIP; total apres coupon TRAIL20 (rabais ~63 CAD).",
+    "items": [
+      {"product_id": "NTG-SHOE-002", "size": "EU 43", "quantity": 1, "unit_price": 259.99},
+      {"product_id": "NTG-BAG-001", "size": "M/L", "quantity": 1, "unit_price": 189.99},
+      {"product_id": "NTG-BAG-003", "size": "M/L", "quantity": 1, "unit_price": 89.99}
+    ]
+  },
+  {
+    "order_id": "NTG-2026-000212",
+    "client_id": "CL-011",
+    "status": "livree",
+    "order_date": "2025-11-01",
+    "payment_status": "paye",
+    "shipping_province": "ON",
+    "shipping_method": "standard",
+    "tracking_number": "CPC-5543210987",
+    "delivery_date": "2025-11-10",
+    "subtotal_amount": 209.99,
+    "shipping_amount": 14.99,
+    "tax_amount": 29.25,
+    "total_amount": 254.23,
+    "currency": "CAD",
+    "return_window_end": "2025-12-10",
+    "notes": "Sac de couchage; retour refuse hors delai.",
+    "items": [
+      {"product_id": "NTG-SLEEP-001", "size": "long", "quantity": 1, "unit_price": 209.99}
+    ]
+  }
+]
