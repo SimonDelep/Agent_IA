@@ -1,0 +1,1 @@
+"""NordTrail Gear FastAPI application."""

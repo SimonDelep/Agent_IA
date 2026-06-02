@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "nordtrail-gear": {
+      "command": "python",
+      "args": ["-m", "mcp_server.server"],
+      "cwd": "Serveur_MCP",
+      "env": {
+        "NORDTRAIL_API_URL": "http://127.0.0.1:8000"
+      }
+    }
+  }
+}
