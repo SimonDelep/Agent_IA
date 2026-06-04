@@ -59,3 +59,16 @@ with get_connection() as conn:
     order = get_order_by_id(conn, "NTG-2026-000201")
     print(order)
 ```
+
+## API REST
+
+Une API FastAPI expose ces données et les actions métier (annulation, retours, validation coupons).
+
+```bash
+cd Serveur_MCP
+pip install -r requirements.txt
+python database/seed_database.py
+uvicorn api.main:app --reload --port 8000
+```
+
+Documentation : [api/README.md](../api/README.md)
