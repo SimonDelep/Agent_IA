@@ -14,13 +14,9 @@ pip install -r requirements.txt
 
 ### 2. Configuration (Crucial!)
 
-Copie le fichier `.env.example` en `.env` et remplis tes clés API:
+Copie `dev.env.example` en `dev.env` à la **racine du dépôt** (`Agent_IA/dev.env`) et remplis tes clés API.
 
-```bash
-cp .env.example .env
-```
-
-Édite `.env` avec tes vraies clés:
+Édite `dev.env` avec tes vraies clés :
 ```
 AZURE_OPENAI_API_KEY=your-key-here
 AZURE_SEARCH_API_KEY=your-key-here
@@ -61,23 +57,20 @@ Exemple de sortie:
 
 ```
 Rag_project/
-├── config.py                 # Configuration centralisée
+├── config.py                 # Configuration centralisée (lit ../dev.env)
 ├── .env.example              # Template des variables d'environnement
-├── .env                      # Variables d'environnement (À NE PAS COMMIT)
-├── ingest_azure.py           # Script d'ingestion des documents
+├── ingest_azure.py           # Ingestion → Azure AI Search
+├── retrieve_azure.py         # Recherche hybride Azure AI Search (single_agent)
+├── ingest.py                 # Ingestion → ChromaDB (option local)
+├── retrieve.py               # Recherche ChromaDB (option local)
 ├── rag_test.py               # Script de test du RAG
-├── rag.py                    # Logique principale du RAG
-├── retrieve.py               # Recherche dans Azure AI Search
-├── embeddings.py             # Gestion des embeddings
-├── vectorstore.py            # Interface avec Azure AI Search
+├── rag.py                    # Pipeline RAG complet (retrieve + LLM)
+├── embeddings.py             # Gestion des embeddings Azure OpenAI
+├── vectorstore.py            # Interface ChromaDB
 ├── utils.py                  # Utilitaires
-├── documents/                # Dossier contenant les documents source
-│   ├── catalogue_produits.csv
-│   ├── faq_livraison.md
-│   ├── guide_tailles.md
-│   └── ... (autres documents)
-├── db/                       # Base de données locale (Chroma)
-└── README.md                 # Ce fichier
+├── documents/                # Documents source
+├── db/                       # Chroma local (optionnel)
+└── README.md
 ```
 
 ## 🔐 Variables d'environnement

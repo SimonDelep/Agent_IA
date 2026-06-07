@@ -52,4 +52,4 @@ Les erreurs métier renvoient HTTP **409** avec `{"detail": "..."}` en français
 
 ## Serveur MCP
 
-Voir [mcp_server/README.md](../mcp_server/README.md) — outils Cursor appelant cette API via HTTP.
+Voir [mcp_server/README.md](../mcp_server/README.md) — outils Cursor et [`single_agent`](../../single_agent/) appelant cette API via HTTP.

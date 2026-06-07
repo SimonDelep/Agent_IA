@@ -1,371 +1,258 @@
-# Assistant RAG pour service client
+# Assistant RAG pour service client — NordTrail Gear
 
-Ce projet implémente la première partie de notre système d’assistant IA : un **RAG** (*Retrieval-Augmented Generation*) capable de répondre à des courriels clients en s’appuyant sur une base documentaire métier.
+Ce projet implémente la base documentaire du système d'assistant IA : un **RAG** (*Retrieval-Augmented Generation*) capable de répondre à des courriels clients en s'appuyant sur les politiques et documents internes de NordTrail Gear.
 
-L’objectif est simple : permettre à l’assistant de chercher les bonnes informations dans les documents de l’entreprise avant de générer une réponse claire, fiable et sourcée.
+L'agent unique ([`single_agent/`](../single_agent/)) consomme cette base via **Azure AI Search** (`retrieve_azure.py`). Une variante **ChromaDB** locale reste disponible pour le développement hors cloud.
 
 ---
 
 ## Contexte du projet
 
-Notre entreprise fictive est une boutique en ligne spécialisée dans les produits outdoor : randonnée, trail, bivouac et équipement technique.
+Boutique en ligne spécialisée outdoor (randonnée, trail, bivouac). Le service client reçoit des demandes sur les retours, annulations, garanties, livraisons et recommandations produits.
 
-Le service client reçoit régulièrement des courriels concernant :
-
-- les retours de produits ;
-- les annulations de commande ;
-- les garanties ;
-- les délais de livraison ;
-- les recommandations produits ;
-- les problèmes de commande.
-
-Le RAG permet à l’assistant de répondre à ces demandes en utilisant les documents internes de l’entreprise plutôt que de répondre uniquement avec les connaissances générales du modèle.
+Le RAG permet à l'assistant de s'appuyer sur les documents internes plutôt que sur les seules connaissances générales du modèle.
 
 ---
 
 ## Ce que fait le système RAG
 
-Le système suit le fonctionnement suivant :
-
 ```text
 Question ou courriel client
         ↓
-Recherche dans la base documentaire
+Recherche hybride (texte + vecteur) dans Azure AI Search
         ↓
 Récupération des passages les plus pertinents
         ↓
-Injection de ces passages dans le prompt
+Injection de ces passages dans le prompt (agent ou rag.py)
         ↓
-Génération d’une réponse contextualisée
+Génération d'une réponse contextualisée
         ↓
 Retour de la réponse avec les sources utilisées
 ```
-
-Le modèle ne répond donc pas “dans le vide”.  
-Il s’appuie sur les documents indexés dans la base vectorielle.
 
 ---
 
 ## Documents utilisés
 
-La base documentaire contient plusieurs types de documents métier :
-
 ```text
 documents/
-├── politique_retours.md
-├── politique_garantie.md
+├── politique_retours.pdf
+├── politique_garantie.pdf
 ├── faq_livraison.md
 ├── conditions_annulation.md
 ├── guide_tailles.md
 ├── procedure_sav_interne.md
 ├── catalogue_produits.csv
-└── commandes_exemples.json
+├── clients_exemples.json
+├── commandes_exemples.json
+└── emails_clients_test.csv   # évaluation uniquement — non indexé
 ```
-
-Ces documents permettent de tester plusieurs cas réalistes :
-
-- retour d’un produit déjà utilisé ;
-- demande d’annulation ;
-- produit encore sous garantie ;
-- commande en retard ;
-- choix d’un produit selon un besoin client ;
-- question sur les délais ou frais de livraison.
 
 ---
 
 ## Structure du projet
 
 ```text
-projet-rag/
-├── .env
-├── config.py
-├── utils.py
-├── embeddings.py
-├── vectorstore.py
-├── ingest.py
-├── retrieve.py
-├── rag.py
+Rag_project/
+├── config.py              # Variables d'environnement (lit dev.env à la racine)
+├── utils.py               # Chargement, nettoyage, chunking
+├── embeddings.py          # Embeddings Azure OpenAI
+├── ingest_azure.py        # Ingestion → Azure AI Search (backend par défaut)
+├── retrieve_azure.py        # Recherche hybride Azure AI Search
+├── ingest.py              # Ingestion → ChromaDB (option local)
+├── retrieve.py            # Recherche ChromaDB (option local)
+├── vectorstore.py         # Interface ChromaDB
+├── rag.py                 # Pipeline RAG complet (retrieve + LLM)
+├── rag_test.py            # Tests Azure Search + LLM
 ├── documents/
-├── chroma_db/
 └── README.md
 ```
 
-### Rôle des fichiers
-
 | Fichier | Rôle |
 |---|---|
-| `config.py` | Regroupe les paramètres principaux du projet |
-| `utils.py` | Charge, nettoie et découpe les documents |
-| `embeddings.py` | Génère les embeddings des textes |
-| `vectorstore.py` | Gère la base vectorielle ChromaDB |
-| `ingest.py` | Indexe les documents dans ChromaDB |
-| `retrieve.py` | Recherche les passages pertinents |
-| `rag.py` | Lance le pipeline RAG complet |
+| `ingest_azure.py` | Indexe les documents dans Azure AI Search (utilisé par `single_agent`) |
+| `retrieve_azure.py` | Recherche hybride dans l'index Azure |
+| `ingest.py` / `retrieve.py` | Variante locale ChromaDB |
+| `rag.py` | Pipeline RAG autonome avec génération LLM |
+| `embeddings.py` | Génération des embeddings via Azure OpenAI |
 
 ---
 
 ## Installation
 
-Créer un environnement virtuel :
-
 ```bash
-python -m venv .venv
+pip install openai chromadb pypdf python-dotenv azure-search-documents
 ```
 
-Activer l’environnement :
+Ou, depuis la racine du dépôt :
 
 ```bash
-# Windows
-.venv\Scripts\activate
-```
-
-```bash
-# Linux / macOS
-source .venv/bin/activate
-```
-
-Installer les dépendances :
-
-```bash
-pip install openai chromadb pypdf python-dotenv
+pip install -r single_agent/requirements.txt
 ```
 
 ---
 
 ## Configuration
 
-Créer un fichier `.env` à la racine du projet.
+Les variables sont centralisées dans `dev.env` à la **racine du dépôt** (`Agent_IA/dev.env`). `config.py` charge ce fichier automatiquement.
 
-### Option avec OpenAI
-
-```env
-OPENAI_API_KEY=your_api_key_here
-OPENAI_MODEL=gpt-4o-mini
-OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+```bash
+cp ../dev.env.example ../dev.env
 ```
 
-### Option avec Azure OpenAI
+Variables essentielles :
 
 ```env
-AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
-AZURE_OPENAI_API_KEY=your_api_key_here
-AZURE_OPENAI_DEPLOYMENT=your_deployment_name
-AZURE_OPENAI_EMBEDDING_DEPLOYMENT=your_embedding_deployment_name
+# Azure OpenAI
+AZURE_OPENAI_API_KEY=...
+AZURE_OPENAI_ENDPOINT=...
+AZURE_OPENAI_API_VERSION=2025-04-01-preview
+AZURE_OPENAI_EMBEDDING_MODEL=nordtrail-embedding
+AZURE_OPENAI_DEPLOYMENT=nordtrail-llm          # pour rag.py
+
+# Azure AI Search
+AZURE_SEARCH_API_KEY=...
+AZURE_SEARCH_ENDPOINT=https://your-search.search.windows.net
+AZURE_SEARCH_INDEX_NAME=index-rag-canadien
+
+# Ingestion
+DOCUMENTS_FOLDER=Rag_project/documents
+CHUNK_SIZE=1500
+CHUNK_OVERLAP=150
+TOP_K=5
 ```
 
-Les clés API ne doivent jamais être écrites directement dans le code.
+Voir aussi [`.env.example`](.env.example) pour la liste complète.
 
 ---
 
-## Ingestion des documents
-
-Avant de poser des questions au RAG, il faut indexer les documents.
+## Ingestion — Azure AI Search (recommandé)
 
 ```bash
-python ingest.py
+cd Rag_project
+python ingest_azure.py
 ```
 
 Ce script :
 
 1. lit les documents du dossier `documents/` ;
-2. nettoie leur contenu ;
-3. découpe les textes en morceaux ;
-4. génère un embedding pour chaque morceau ;
-5. stocke les résultats dans ChromaDB.
+2. nettoie et découpe les textes (chunks de 1500 caractères, overlap 150) ;
+3. génère un embedding Azure OpenAI par chunk ;
+4. crée l'index Search s'il n'existe pas ;
+5. uploade les vecteurs dans Azure AI Search.
 
-La base vectorielle est sauvegardée localement dans le dossier :
+Exemple de sortie :
 
 ```text
-chroma_db/
+INGESTION DES DOCUMENTS DANS AZURE AI SEARCH
+Trouvé 9 fichiers à traiter
+INGESTION TERMINÉE: 57 chunks indexés au total
 ```
 
 ---
 
-## Stratégie de chunking
+## Ingestion — ChromaDB (option locale)
 
-Les documents sont découpés en morceaux de taille moyenne afin de garder assez de contexte sans créer des blocs trop longs.
+Pour un index vectoriel local sans Azure AI Search :
 
-Paramètres utilisés :
-
-```text
-chunk_size = 500
-overlap = 50
+```bash
+cd Rag_project
+python ingest.py
 ```
 
-Ce choix permet :
-
-- de garder des passages assez complets ;
-- d’éviter de couper une règle métier importante ;
-- d’améliorer les chances de récupérer le bon contexte ;
-- de limiter le bruit dans le prompt final.
-
-L’overlap permet de conserver une continuité entre deux chunks voisins.
+Les données sont stockées dans `CHROMA_PATH` (défaut : `./db/chroma_store` à la racine du dépôt).
 
 ---
 
 ## Recherche documentaire
 
-La recherche sémantique se fait avec ChromaDB.
+**Azure AI Search** (backend `single_agent`) :
 
-Exemple :
+```python
+from retrieve_azure import retrieve
+results = retrieve("politique de retour chaussures", top_k=5)
+```
+
+**ChromaDB** (local) :
 
 ```bash
 python retrieve.py
 ```
 
-Le système transforme la question en embedding, puis récupère les passages les plus proches dans la base vectorielle.
-
-Par défaut, on récupère les 5 passages les plus pertinents :
-
-```text
-top_k = 5
-```
-
-Un `top_k` trop faible peut manquer des informations importantes.  
-Un `top_k` trop élevé peut ajouter du bruit dans le contexte.
+Par défaut, `top_k = 5` passages récupérés.
 
 ---
 
-## Génération de réponse
+## Pipeline RAG complet (avec LLM)
 
-Le fichier `rag.py` lance le pipeline complet.
-
-Exemple :
+Le fichier `rag.py` enchaîne retrieval + génération de réponse :
 
 ```bash
 python rag.py
 ```
 
-Le système :
+Pour tester Azure Search avec plusieurs questions :
 
-1. reçoit une question ou un courriel client ;
-2. récupère les passages utiles ;
-3. construit un prompt avec le contexte ;
-4. génère une réponse ;
-5. retourne aussi les sources utilisées.
-
-Exemple de question :
-
-```text
-Bonjour, j’ai acheté des chaussures de trail il y a 22 jours.
-Je les ai utilisées une fois dehors, mais elles me font mal.
-Puis-je les retourner ?
-```
-
-Exemple de réponse attendue :
-
-```text
-Le retour est encore dans le délai de 30 jours. Cependant, la politique de retour indique que les chaussures utilisées en extérieur ne sont pas automatiquement remboursables si elles présentent des traces d’usage. Le client peut contacter le service client pour une étude exceptionnelle, mais le remboursement n’est pas garanti.
-
-Sources utilisées :
-- politique_retours.md
+```bash
+python rag_test.py
 ```
 
 ---
 
-## Pourquoi utiliser un RAG ?
+## Intégration avec `single_agent`
 
-Un RAG est adapté à ce projet parce que les réponses du service client dépendent de documents métier précis.
+L'agent unique appelle `search_company_documents` qui délègue à `retrieve_azure.py`. Flux :
 
-Sans RAG, le modèle pourrait inventer une règle ou répondre de manière trop générale.
+```text
+single_agent.main
+    → agent.py (Azure Responses API)
+    → rag_tool.py → retrieve_azure.py → Azure AI Search
+    → mcp_client.py → API FastAPI :8000
+```
 
-Avec le RAG, l’assistant peut :
+Voir [`single_agent/README.md`](../single_agent/README.md) pour le démarrage complet.
 
-- utiliser les politiques internes ;
-- citer les sources ;
-- s’adapter si les documents changent ;
-- limiter les hallucinations ;
-- préparer l’évolution vers un agent capable d’agir.
+---
+
+## Stratégie de chunking
+
+Paramètres par défaut (`dev.env`) :
+
+```text
+CHUNK_SIZE = 1500
+CHUNK_OVERLAP = 150
+```
+
+Ces valeurs conservent des passages métier complets tout en limitant le bruit dans le contexte injecté au LLM.
 
 ---
 
 ## Évaluation
 
-Le système peut être évalué avec un jeu de questions-réponses préparé à l’avance.
+Le fichier `emails_clients_test.csv` sert aux tests d'évaluation et **n'est pas indexé** dans la base RAG.
 
-Exemple de fichier :
-
-```text
-evaluation/questions_test.csv
-```
-
-Chaque ligne contient :
-
-| Champ | Description |
-|---|---|
-| `question` | Question ou courriel client |
-| `expected_answer` | Réponse attendue |
-| `expected_sources` | Documents qui devraient être retrouvés |
-
-Métriques possibles :
-
-| Métrique | Objectif |
-|---|---|
-| `faithfulness` | Vérifier que la réponse est bien fondée sur les documents |
-| `answer_relevancy` | Vérifier que la réponse répond à la question |
-| `context_recall` | Vérifier que les bons documents sont récupérés |
-| `context_precision` | Vérifier que les documents récupérés sont pertinents |
-
-L’objectif n’est pas seulement d’avoir une réponse fluide.  
-L’objectif est d’avoir une réponse correcte, justifiée et traçable.
+Métriques possibles : faithfulness, answer relevancy, context recall, context precision.
 
 ---
 
-## Limites actuelles
+## Dépannage
 
-Cette première version reste volontairement simple.
+| Problème | Action |
+|---|---|
+| RAG vide dans `single_agent` | Relancer `python ingest_azure.py`, vérifier `AZURE_SEARCH_*` |
+| Erreur embedding | Vérifier `AZURE_OPENAI_EMBEDDING_MODEL` (nom du déploiement Azure) |
+| Index introuvable | `ingest_azure.py` crée l'index automatiquement au premier lancement |
+| Encodage console Windows | `$env:PYTHONIOENCODING="utf-8"` avant les scripts Python |
 
-Limites identifiées :
-
-- le chunking est encore basique ;
-- la recherche est uniquement vectorielle ;
-- il n’y a pas encore de reranking ;
-- les tableaux sont traités simplement ;
-- le système ne peut pas encore modifier une commande ;
-- les appels d’outils seront ajoutés dans la phase suivante.
-
-Ces limites sont normales pour une première version RAG.
-
----
-
-## Prochaine étape
-
-La prochaine phase consistera à transformer ce RAG en **agent LLM unique connecté à des outils**.
-
-L’agent devra pouvoir :
-
-- lire un courriel client ;
-- identifier l’intention ;
-- extraire les informations importantes ;
-- utiliser le RAG pour consulter les règles ;
-- appeler une API simulée ;
-- produire une réponse finale fiable.
-
-Exemples d’outils futurs :
-
-```text
-get_order_status(order_id)
-cancel_order(order_id)
-create_return_request(order_id)
-check_warranty(product_id)
-search_product_catalog(criteria)
-```
-
-Le RAG devient donc la base de connaissance de l’agent.
+Guide détaillé : [`SETUP.md`](SETUP.md).
 
 ---
 
 ## Résumé
 
-Cette partie du projet construit un système RAG simple, lisible et fonctionnel.
+Ce projet fournit :
 
-Il permet :
-
-- d’ingérer des documents métier ;
-- de créer une base vectorielle ;
-- de récupérer les passages pertinents ;
-- de générer des réponses contextualisées ;
-- de citer les sources utilisées ;
-- de préparer l’évolution vers un agent plus complet.
-
-Ce projet sert de fondation pour les prochaines étapes : agent avec outils, puis orchestration multi-agents.
+- l'ingestion documentaire vers **Azure AI Search** (production) ou **ChromaDB** (local) ;
+- la recherche sémantique hybride pour alimenter l'agent `single_agent` ;
+- un pipeline RAG autonome (`rag.py`) pour tests et démonstrations ;
+- des réponses traçables avec citation des sources documentaires.

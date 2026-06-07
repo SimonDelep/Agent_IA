@@ -73,7 +73,9 @@ Scénarios de test : [database/DEMO_IDS.md](../database/DEMO_IDS.md).
 ## Architecture
 
 ```text
-Cursor / Agent  --stdio-->  mcp_server/server.py  --HTTP-->  api (FastAPI)  -->  SQLite
+Cursor / Agent / single_agent  --stdio-->  mcp_server/server.py  --HTTP-->  api (FastAPI)  -->  SQLite
 ```
+
+L'agent Python [`single_agent/`](../single_agent/) utilise ce serveur MCP en subprocess stdio et combine les outils avec un RAG Azure AI Search.
 
 Les erreurs API (404, 409) sont renvoyées au modèle en JSON avec `error: true` et `detail` en français.
