@@ -1,5 +1,5 @@
 """
-CLI de démonstration pour l'agent unique MCP + RAG.
+CLI de démonstration pour l'agent unique MCP + RAG (Azure AI Search).
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ SAMPLE_QUESTIONS = [
         "as-tu sur le client associé ?"
     ),
     (
-        "Le client marie.tremblay@email.com demande d'annuler sa commande en attente. "
+        "Le client felix.roy@example.ca demande d'annuler sa commande (id de commande : NTG-2026-000208). "
         "Vérifie d'abord les règles d'annulation dans les documents, puis le statut "
         "de sa commande via l'API."
     ),
@@ -44,7 +44,7 @@ def main() -> None:
         _run_question(" ".join(sys.argv[1:]))
         return
 
-    print("Agent unique NordTrail Gear — MCP + RAG")
+    print("Agent unique NordTrail Gear — MCP + RAG (Azure AI Search)")
     print("Entrez une question (ligne vide = exemples intégrés, 'quit' pour quitter).\n")
 
     try:

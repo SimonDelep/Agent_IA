@@ -7,6 +7,8 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(_REPO_ROOT / "dev.env")
 load_dotenv(".env")
 
 # ==================== AZURE OPENAI CONFIGURATION ====================
@@ -35,6 +37,7 @@ CHROMA_COLLECTION = os.getenv("CHROMA_COLLECTION", "nordtrail_documents")
 DOCUMENTS_FOLDER = os.getenv("DOCUMENTS_FOLDER", "./documents")
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "1500"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "150"))
+TOP_K = int(os.getenv("TOP_K", "5"))
 
 # ==================== LOGGING & DEBUG ====================
 DEBUG_MODE = os.getenv("DEBUG_MODE", "False").lower() == "true"
