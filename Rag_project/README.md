@@ -2,7 +2,7 @@
 
 Ce projet implémente la base documentaire du système d'assistant IA : un **RAG** (*Retrieval-Augmented Generation*) capable de répondre à des courriels clients en s'appuyant sur les politiques et documents internes de NordTrail Gear.
 
-L'agent unique ([`single_agent/`](../single_agent/)) consomme cette base via **Azure AI Search** (`retrieve_azure.py`). Une variante **ChromaDB** locale reste disponible pour le développement hors cloud.
+Les agents [`single_agent/`](../single_agent/) et [`multi_agent/`](../multi_agent/) consomment cette base via **ChromaDB** (`retrieve.py`) par défaut. Une variante **Azure AI Search** reste disponible pour un déploiement cloud.
 
 ---
 
@@ -16,10 +16,12 @@ Le RAG permet à l'assistant de s'appuyer sur les documents internes plutôt que
 
 ## Ce que fait le système RAG
 
+**Backend par défaut (ChromaDB — agents)**
+
 ```text
 Question ou courriel client
         ↓
-Recherche hybride (texte + vecteur) dans Azure AI Search
+Recherche vectorielle dans ChromaDB (embeddings Azure OpenAI)
         ↓
 Récupération des passages les plus pertinents
         ↓
@@ -28,6 +30,12 @@ Injection de ces passages dans le prompt (agent ou rag.py)
 Génération d'une réponse contextualisée
         ↓
 Retour de la réponse avec les sources utilisées
+```
+
+**Variante Azure AI Search (option cloud)**
+
+```text
+Question → recherche hybride (texte + vecteur) dans Azure AI Search → passages → LLM
 ```
 
 ---
@@ -57,11 +65,11 @@ Rag_project/
 ├── config.py              # Variables d'environnement (lit dev.env à la racine)
 ├── utils.py               # Chargement, nettoyage, chunking
 ├── embeddings.py          # Embeddings Azure OpenAI
-├── ingest_azure.py        # Ingestion → Azure AI Search (backend par défaut)
-├── retrieve_azure.py        # Recherche hybride Azure AI Search
-├── ingest.py              # Ingestion → ChromaDB (option local)
-├── retrieve.py            # Recherche ChromaDB (option local)
+├── ingest.py              # Ingestion → ChromaDB (backend par défaut des agents)
+├── retrieve.py            # Recherche ChromaDB (backend par défaut des agents)
 ├── vectorstore.py         # Interface ChromaDB
+├── ingest_azure.py        # Ingestion → Azure AI Search (option cloud)
+├── retrieve_azure.py      # Recherche hybride Azure AI Search (option cloud)
 ├── rag.py                 # Pipeline RAG complet (retrieve + LLM)
 ├── rag_test.py            # Tests Azure Search + LLM
 ├── documents/
@@ -70,9 +78,8 @@ Rag_project/
 
 | Fichier | Rôle |
 |---|---|
-| `ingest_azure.py` | Indexe les documents dans Azure AI Search (utilisé par `single_agent`) |
-| `retrieve_azure.py` | Recherche hybride dans l'index Azure |
-| `ingest.py` / `retrieve.py` | Variante locale ChromaDB |
+| `ingest.py` / `retrieve.py` | Ingestion et recherche ChromaDB (utilisé par `single_agent` et `multi_agent`) |
+| `ingest_azure.py` / `retrieve_azure.py` | Variante Azure AI Search (option cloud) |
 | `rag.py` | Pipeline RAG autonome avec génération LLM |
 | `embeddings.py` | Génération des embeddings via Azure OpenAI |
 
@@ -110,10 +117,9 @@ AZURE_OPENAI_API_VERSION=2025-04-01-preview
 AZURE_OPENAI_EMBEDDING_MODEL=nordtrail-embedding
 AZURE_OPENAI_DEPLOYMENT=nordtrail-llm          # pour rag.py
 
-# Azure AI Search
-AZURE_SEARCH_API_KEY=...
-AZURE_SEARCH_ENDPOINT=https://your-search.search.windows.net
-AZURE_SEARCH_INDEX_NAME=index-rag-canadien
+# ChromaDB (backend par défaut des agents)
+CHROMA_PATH=./db/chroma_store
+CHROMA_COLLECTION=nordtrail_documents
 
 # Ingestion
 DOCUMENTS_FOLDER=Rag_project/documents
@@ -122,15 +128,22 @@ CHUNK_OVERLAP=150
 TOP_K=5
 ```
 
+Variables optionnelles pour Azure AI Search :
+
+```env
+AZURE_SEARCH_API_KEY=...
+AZURE_SEARCH_ENDPOINT=https://your-search.search.windows.net
+AZURE_SEARCH_INDEX_NAME=index-rag-canadien
+```
+
 Voir aussi [`.env.example`](.env.example) pour la liste complète.
 
 ---
 
-## Ingestion — Azure AI Search (recommandé)
+## Ingestion — ChromaDB (recommandé pour les agents)
 
 ```bash
-cd Rag_project
-python ingest_azure.py
+python Rag_project/ingest.py
 ```
 
 Ce script :
@@ -138,8 +151,20 @@ Ce script :
 1. lit les documents du dossier `documents/` ;
 2. nettoie et découpe les textes (chunks de 1500 caractères, overlap 150) ;
 3. génère un embedding Azure OpenAI par chunk ;
-4. crée l'index Search s'il n'existe pas ;
-5. uploade les vecteurs dans Azure AI Search.
+4. stocke les vecteurs dans ChromaDB (`CHROMA_PATH`, défaut `./db/chroma_store` à la racine du dépôt).
+
+> Fermez Streamlit ou tout autre processus utilisant Chroma avant de réingérer.
+
+---
+
+## Ingestion — Azure AI Search (option cloud)
+
+Pour un index cloud sans ChromaDB local :
+
+```bash
+cd Rag_project
+python ingest_azure.py
+```
 
 Exemple de sortie :
 
@@ -149,34 +174,30 @@ Trouvé 9 fichiers à traiter
 INGESTION TERMINÉE: 57 chunks indexés au total
 ```
 
----
-
-## Ingestion — ChromaDB (option locale)
-
-Pour un index vectoriel local sans Azure AI Search :
-
-```bash
-cd Rag_project
-python ingest.py
-```
-
-Les données sont stockées dans `CHROMA_PATH` (défaut : `./db/chroma_store` à la racine du dépôt).
+Adaptez ensuite `single_agent/rag_tool.py` pour utiliser `retrieve_azure` si vous basculez les agents vers Azure Search.
 
 ---
 
 ## Recherche documentaire
 
-**Azure AI Search** (backend `single_agent`) :
+**ChromaDB** (backend `single_agent` / `multi_agent`) :
+
+```python
+from retrieve import retrieve
+results = retrieve("politique de retour chaussures", top_k=5)
+```
+
+Ou en ligne de commande :
+
+```bash
+python retrieve.py
+```
+
+**Azure AI Search** (option cloud) :
 
 ```python
 from retrieve_azure import retrieve
 results = retrieve("politique de retour chaussures", top_k=5)
-```
-
-**ChromaDB** (local) :
-
-```bash
-python retrieve.py
 ```
 
 Par défaut, `top_k = 5` passages récupérés.
@@ -199,18 +220,18 @@ python rag_test.py
 
 ---
 
-## Intégration avec `single_agent`
+## Intégration avec les agents
 
-L'agent unique appelle `search_company_documents` qui délègue à `retrieve_azure.py`. Flux :
+Les agents appellent `search_company_documents` qui délègue à `retrieve.py` (ChromaDB). Flux :
 
 ```text
-single_agent.main
-    → agent.py (Azure Responses API)
-    → rag_tool.py → retrieve_azure.py → Azure AI Search
-    → mcp_client.py → API FastAPI :8000
+single_agent.main / multi_agent.main
+    → agent(s) (Azure OpenAI)
+    → rag_tool.py → retrieve.py → ChromaDB
+    → mcp_client.py → API FastAPI :8001
 ```
 
-Voir [`single_agent/README.md`](../single_agent/README.md) pour le démarrage complet.
+Voir [`single_agent/README.md`](../single_agent/README.md) et [`multi_agent/README.md`](../multi_agent/README.md) pour le démarrage complet.
 
 ---
 
@@ -239,9 +260,10 @@ Métriques possibles : faithfulness, answer relevancy, context recall, context p
 
 | Problème | Action |
 |---|---|
-| RAG vide dans `single_agent` | Relancer `python ingest_azure.py`, vérifier `AZURE_SEARCH_*` |
+| RAG vide dans les agents | Relancer `python Rag_project/ingest.py`, vérifier `CHROMA_PATH` et `AZURE_OPENAI_EMBEDDING_MODEL` |
 | Erreur embedding | Vérifier `AZURE_OPENAI_EMBEDDING_MODEL` (nom du déploiement Azure) |
-| Index introuvable | `ingest_azure.py` crée l'index automatiquement au premier lancement |
+| Erreur Chroma `default_tenant` | API NordTrail sur port **8001**, `chromadb>=1.0`, réingérer après fermeture des clients Chroma |
+| Index Azure introuvable | `ingest_azure.py` crée l'index automatiquement au premier lancement |
 | Encodage console Windows | `$env:PYTHONIOENCODING="utf-8"` avant les scripts Python |
 
 Guide détaillé : [`SETUP.md`](SETUP.md).
@@ -252,7 +274,7 @@ Guide détaillé : [`SETUP.md`](SETUP.md).
 
 Ce projet fournit :
 
-- l'ingestion documentaire vers **Azure AI Search** (production) ou **ChromaDB** (local) ;
-- la recherche sémantique hybride pour alimenter l'agent `single_agent` ;
+- l'ingestion documentaire vers **ChromaDB** (agents locaux) ou **Azure AI Search** (cloud) ;
+- la recherche sémantique pour alimenter `single_agent` et `multi_agent` ;
 - un pipeline RAG autonome (`rag.py`) pour tests et démonstrations ;
 - des réponses traçables avec citation des sources documentaires.

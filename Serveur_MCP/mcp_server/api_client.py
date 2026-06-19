@@ -36,7 +36,7 @@ def request(
         return _format_error(
             0,
             "API non joignable. Démarrez l'API : "
-            "cd Serveur_MCP && uvicorn api.main:app --port 8000",
+            "cd Serveur_MCP && uvicorn api.main:app --port 8001",
         )
     except httpx.TimeoutException:
         return _format_error(0, "Délai d'attente API dépassé.")

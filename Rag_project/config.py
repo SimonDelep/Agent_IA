@@ -11,6 +11,15 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(_REPO_ROOT / "dev.env")
 load_dotenv(".env")
 
+
+def _resolve_from_repo(raw: str) -> str:
+    """Chemin absolu depuis la racine du dépôt (indépendant du cwd)."""
+    path = Path(raw)
+    if not path.is_absolute():
+        path = (_REPO_ROOT / raw).resolve()
+    return str(path)
+
+
 # ==================== AZURE OPENAI CONFIGURATION ====================
 # Clés et endpoints pour Azure OpenAI
 OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
@@ -28,13 +37,15 @@ SEARCH_API_KEY = os.getenv("AZURE_SEARCH_API_KEY")
 SEARCH_INDEX_NAME = os.getenv("AZURE_SEARCH_INDEX_NAME", "index-rag-canadien")
 
 # ==================== CHROMA CONFIGURATION (Local Vector Store) ====================
-# Configuration pour stockage local avec Chroma (optionnel)
-CHROMA_PATH = os.getenv("CHROMA_PATH", "./db/chroma_store")
+_chroma_raw = os.getenv("CHROMA_PATH", "./db/chroma_store")
+CHROMA_PATH = _resolve_from_repo(_chroma_raw)
+os.environ["CHROMA_PATH"] = CHROMA_PATH
 CHROMA_COLLECTION = os.getenv("CHROMA_COLLECTION", "nordtrail_documents")
 
 # ==================== DOCUMENT INGESTION CONFIGURATION ====================
-# Chemins et paramètres pour l'ingestion
-DOCUMENTS_FOLDER = os.getenv("DOCUMENTS_FOLDER", "./documents")
+_docs_raw = os.getenv("DOCUMENTS_FOLDER", "Rag_project/documents")
+DOCUMENTS_FOLDER = _resolve_from_repo(_docs_raw)
+DOCUMENTS_PATH = DOCUMENTS_FOLDER
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "1500"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "150"))
 TOP_K = int(os.getenv("TOP_K", "5"))

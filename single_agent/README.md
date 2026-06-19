@@ -1,33 +1,32 @@
-# Agent unique — MCP + RAG (Azure AI Search)
+# Agent unique — MCP + RAG (ChromaDB)
 
 Un seul agent Azure OpenAI (API Responses) qui combine :
 
 - **14 outils MCP** du serveur NordTrail Gear ([`Serveur_MCP/mcp_server/server.py`](../Serveur_MCP/mcp_server/server.py))
-- **`search_company_documents`** — recherche dans **Azure AI Search** ([`Rag_project/retrieve_azure.py`](../Rag_project/retrieve_azure.py)), sans second appel LLM dans l'outil
+- **`search_company_documents`** — recherche dans **ChromaDB** ([`Rag_project/retrieve.py`](../Rag_project/retrieve.py)), sans second appel LLM dans l'outil
 
 Le dossier [`Agent/`](../Agent/) n'est pas modifié.
 
 ## Prérequis
 
-1. **Base SQLite + API FastAPI**
+1. **Base SQLite + API FastAPI** (port **8001** — évite le conflit avec ChromaDB sur 8000)
 
 ```bash
 cd Serveur_MCP
 python database/seed_database.py
 pip install -r requirements.txt
-uvicorn api.main:app --reload --port 8000
+uvicorn api.main:app --reload --port 8001
 ```
 
-2. **Index Azure AI Search (RAG)**
+2. **Index ChromaDB (RAG)**
 
 Depuis la racine du dépôt, configurez `dev.env` (voir ci-dessous), puis ingérez les documents :
 
 ```bash
-cd Rag_project
-python ingest_azure.py
+python Rag_project/ingest.py
 ```
 
-Le script crée l'index s'il n'existe pas et vectorise les fichiers de `Rag_project/documents/`.
+Le script vectorise les fichiers de `Rag_project/documents/` et stocke l'index dans `CHROMA_PATH` (défaut : `./db/chroma_store` à la racine du dépôt).
 
 3. **Variables Azure** — copier le modèle à la racine du dépôt, puis renseigner vos clés :
 
@@ -44,12 +43,15 @@ Le fichier `dev.env` n'est jamais versionné. Variables requises :
 - `AZURE_OPENAI_API_VERSION`
 - `AZURE_OPENAI_DEPLOYMENT`
 
-**RAG (embeddings + Azure AI Search)**
+**RAG (embeddings + ChromaDB)**
 
 - `AZURE_OPENAI_EMBEDDING_MODEL`
-- `AZURE_SEARCH_API_KEY`
-- `AZURE_SEARCH_ENDPOINT`
-- `AZURE_SEARCH_INDEX_NAME`
+- `CHROMA_PATH` (optionnel, défaut `./db/chroma_store`)
+- `CHROMA_COLLECTION` (optionnel, défaut `nordtrail_documents`)
+
+**API NordTrail**
+
+- `NORDTRAIL_API_URL` (défaut `http://127.0.0.1:8001`)
 
 4. **Dépendances agent**
 
@@ -64,9 +66,9 @@ pip install -r Serveur_MCP/requirements.txt
 python -m single_agent.smoke_test
 ```
 
-Valide la connexion MCP (14 outils + `check_api_health`) et une recherche RAG dans Azure AI Search.
+Valide la connexion MCP (14 outils + `check_api_health`) et une recherche RAG dans ChromaDB.
 
-> Le smoke test appelle Azure (embeddings + Search). L'API FastAPI doit tourner pour la partie MCP.
+> Le smoke test appelle Azure pour les embeddings. L'API FastAPI doit tourner pour la partie MCP, et l'index Chroma doit être ingéré.
 
 ## Lancement
 
@@ -91,8 +93,8 @@ python -m single_agent.main "Quelle est la politique de retour pour une chaussur
 ```text
 Question utilisateur
     → Azure Responses API (boucle outils)
-    → search_company_documents  →  Rag_project.retrieve_azure()  →  Azure AI Search
-    → outils MCP (stdio)        →  API REST :8000
+    → search_company_documents  →  Rag_project.retrieve()  →  ChromaDB
+    → outils MCP (stdio)        →  API REST :8001
     → Réponse finale en français
 ```
 
@@ -100,21 +102,21 @@ Question utilisateur
 
 | Variable | Défaut | Description |
 |----------|--------|-------------|
-| `NORDTRAIL_API_URL` | `http://127.0.0.1:8000` | URL API NordTrail |
+| `NORDTRAIL_API_URL` | `http://127.0.0.1:8001` | URL API NordTrail |
 | `MCP_COMMAND` | `python` | Exécutable pour le serveur MCP |
 | `MAX_TOOL_ITERATIONS` | `10` | Limite de tours outils |
 | `TOP_K` | `5` | Passages RAG par recherche |
-| `DOCUMENTS_FOLDER` | `Rag_project/documents` | Dossier source pour `ingest_azure.py` |
+| `DOCUMENTS_FOLDER` | `Rag_project/documents` | Dossier source pour `ingest.py` |
 | `CHUNK_SIZE` | `1500` | Taille des chunks à l'ingestion |
 | `CHUNK_OVERLAP` | `150` | Chevauchement entre chunks |
 
 ## Dépannage
 
 - **Erreur MCP / connexion** : vérifier que l'API tourne sur le port configuré (`check_api_health` via MCP).
-- **RAG vide (`found=false`)** : relancer `python ingest_azure.py` dans `Rag_project/` et vérifier `AZURE_SEARCH_*` dans `dev.env`.
-- **Erreur d'index Search** : l'ingestion recrée l'index au premier lancement ; vérifiez que la clé API Search a les droits admin.
+- **RAG vide (`found=false`)** : relancer `python Rag_project/ingest.py` et vérifier `CHROMA_PATH` / `AZURE_OPENAI_EMBEDDING_MODEL` dans `dev.env`.
+- **Erreur Chroma `default_tenant`** : API sur port **8001** (pas 8000), `chromadb>=1.0`, réingérer après fermeture de Streamlit si besoin.
 - **Clés manquantes** : copier `dev.env.example` vers `dev.env` à la racine du dépôt.
 
-## RAG local (Chroma) — optionnel
+## RAG Azure AI Search — optionnel
 
-Pour un index vectoriel local (sans Azure AI Search), utilisez `Rag_project/ingest.py` et adaptez `single_agent/rag_tool.py` pour importer `retrieve` au lieu de `retrieve_azure`. Par défaut, l'agent utilise **Azure AI Search**.
+Pour un index cloud au lieu de ChromaDB, utilisez `Rag_project/ingest_azure.py` et adaptez `single_agent/rag_tool.py` pour importer `retrieve_azure` au lieu de `retrieve`. Par défaut, l'agent utilise **ChromaDB local**.
