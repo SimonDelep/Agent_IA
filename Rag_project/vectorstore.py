@@ -1,54 +1,94 @@
+import shutil
+import threading
+from pathlib import Path
+from typing import Optional
+
 import chromadb
 from chromadb.api.models.Collection import Collection
+from chromadb.config import Settings
 
-from config import CHROMA_PATH, CHROMA_COLLECTION
+from config import CHROMA_COLLECTION, CHROMA_PATH
+
+_chroma_lock = threading.RLock()
+_chroma_client: Optional["chromadb.PersistentClient"] = None
+_chroma_collection: Optional[Collection] = None
+
+
+def _chroma_settings() -> Settings:
+    return Settings(anonymized_telemetry=False)
+
+
+def _invalidate_chroma_cache() -> None:
+    """Réinitialise le singleton en mémoire (ingestion / reset uniquement)."""
+    global _chroma_client, _chroma_collection
+    with _chroma_lock:
+        _chroma_client = None
+        _chroma_collection = None
 
 
 def get_chroma_client() -> chromadb.PersistentClient:
     """
-    Crée un client ChromaDB persistant.
-
-    Les données vectorielles sont stockées localement dans CHROMA_PATH.
-    Exemple : ./db/chroma_store
+    Client ChromaDB persistant partagé (une instance par processus).
     """
-    return chromadb.PersistentClient(path=CHROMA_PATH)
+    global _chroma_client
+    with _chroma_lock:
+        if _chroma_client is None:
+            _chroma_client = chromadb.PersistentClient(
+                path=CHROMA_PATH,
+                settings=_chroma_settings(),
+            )
+        return _chroma_client
 
 
 def get_collection() -> Collection:
     """
     Récupère ou crée la collection ChromaDB utilisée par le RAG.
-
-    La distance cosine est adaptée aux embeddings OpenAI/Azure OpenAI.
     """
-    client = get_chroma_client()
-
-    collection = client.get_or_create_collection(
-        name=CHROMA_COLLECTION,
-        metadata={"hnsw:space": "cosine"}
-    )
-
-    return collection
+    global _chroma_collection
+    with _chroma_lock:
+        if _chroma_collection is None:
+            client = get_chroma_client()
+            _chroma_collection = client.get_or_create_collection(
+                name=CHROMA_COLLECTION,
+                metadata={"hnsw:space": "cosine"},
+            )
+        return _chroma_collection
 
 
 def reset_collection() -> Collection:
     """
-    Supprime puis recrée la collection.
-
-    À utiliser pendant l'ingestion pour repartir d'une base propre.
-    Attention : cela efface les anciens chunks indexés.
+    Supprime puis recrée la collection et la base SQLite ChromaDB.
     """
-    client = get_chroma_client()
+    global _chroma_client, _chroma_collection
+    _invalidate_chroma_cache()
+
+    chroma_dir = Path(CHROMA_PATH)
+    if chroma_dir.exists():
+        try:
+            shutil.rmtree(chroma_dir)
+        except PermissionError as exc:
+            raise RuntimeError(
+                f"Impossible de supprimer {chroma_dir}. "
+                "Fermez Streamlit et les autres processus utilisant ChromaDB, puis relancez l'ingestion."
+            ) from exc
+    chroma_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        client.delete_collection(name=CHROMA_COLLECTION)
-        print(f"Collection supprimée : {CHROMA_COLLECTION}")
+        chromadb.api.client.SharedSystemClient.clear_system_cache()
     except Exception:
-        print(f"Aucune collection existante à supprimer : {CHROMA_COLLECTION}")
+        pass
 
-    collection = client.get_or_create_collection(
-        name=CHROMA_COLLECTION,
-        metadata={"hnsw:space": "cosine"}
+    client = chromadb.PersistentClient(
+        path=CHROMA_PATH,
+        settings=_chroma_settings(),
     )
+    collection = client.create_collection(
+        name=CHROMA_COLLECTION,
+        metadata={"hnsw:space": "cosine"},
+    )
+    with _chroma_lock:
+        _chroma_client = client
+        _chroma_collection = collection
 
     print(f"Collection créée : {CHROMA_COLLECTION}")
     return collection

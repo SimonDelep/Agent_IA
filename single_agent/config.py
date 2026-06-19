@@ -29,7 +29,7 @@ AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 # MCP subprocess
 MCP_COMMAND = os.getenv("MCP_COMMAND", "python")
 MCP_SERVER_MODULE = os.getenv("MCP_SERVER_MODULE", "mcp_server.server")
-NORDTRAIL_API_URL = os.getenv("NORDTRAIL_API_URL", "http://127.0.0.1:8000")
+NORDTRAIL_API_URL = os.getenv("NORDTRAIL_API_URL", "http://127.0.0.1:8001")
 
 MAX_TOOL_ITERATIONS = int(os.getenv("MAX_TOOL_ITERATIONS", "10"))
 DEFAULT_RAG_TOP_K = int(os.getenv("TOP_K", "5"))

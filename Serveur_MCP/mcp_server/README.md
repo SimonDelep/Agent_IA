@@ -5,11 +5,11 @@ Expose les opérations service client via le protocole MCP (stdio). Chaque outil
 ## Prérequis
 
 1. Base initialisée : `python database/seed_database.py`
-2. **API démarrée** (obligatoire avant Cursor) :
+2. **API démarrée** (obligatoire avant Cursor ou les agents) :
 
 ```bash
 cd Serveur_MCP
-uvicorn api.main:app --reload --port 8000
+uvicorn api.main:app --reload --port 8001
 ```
 
 3. Dépendances : `pip install -r requirements.txt` (inclut `mcp` et `httpx`)
@@ -33,7 +33,7 @@ Ajoutez dans `.cursor/mcp.json` à la racine du projet (ajustez les chemins) :
       "args": ["-m", "mcp_server.server"],
       "cwd": "C:/Users/marin/Desktop/Marin/Etudes/UQAC/Semestre_ete/llm_cloud/Agent_IA/Serveur_MCP",
       "env": {
-        "NORDTRAIL_API_URL": "http://127.0.0.1:8000"
+        "NORDTRAIL_API_URL": "http://127.0.0.1:8001"
       }
     }
   }
@@ -46,7 +46,7 @@ Redémarrez Cursor après modification. Vérifiez que l'API tourne sur le port c
 
 | Variable | Défaut | Description |
 |----------|--------|-------------|
-| `NORDTRAIL_API_URL` | `http://127.0.0.1:8000` | URL de base de l'API |
+| `NORDTRAIL_API_URL` | `http://127.0.0.1:8001` | URL de base de l'API |
 | `NORDTRAIL_API_TIMEOUT` | `30` | Timeout HTTP (secondes) |
 
 ## Outils exposés
@@ -73,9 +73,9 @@ Scénarios de test : [database/DEMO_IDS.md](../database/DEMO_IDS.md).
 ## Architecture
 
 ```text
-Cursor / Agent / single_agent  --stdio-->  mcp_server/server.py  --HTTP-->  api (FastAPI)  -->  SQLite
+Cursor / single_agent / multi_agent  --stdio-->  mcp_server/server.py  --HTTP-->  api (FastAPI)  -->  SQLite
 ```
 
-L'agent Python [`single_agent/`](../single_agent/) utilise ce serveur MCP en subprocess stdio et combine les outils avec un RAG Azure AI Search.
+Les agents Python [`single_agent/`](../../single_agent/) et [`multi_agent/`](../../multi_agent/) utilisent ce serveur MCP en subprocess stdio et le combinent avec un RAG ChromaDB.
 
 Les erreurs API (404, 409) sont renvoyées au modèle en JSON avec `error: true` et `detail` en français.

@@ -13,7 +13,7 @@ from vectorstore import reset_collection, add_chunks, count_chunks
 
 
 # Dossier contenant les documents métier
-DOCUMENTS_PATH = Path(getattr(config, "DOCUMENTS_PATH", "./documents"))
+DOCUMENTS_PATH = Path(config.DOCUMENTS_PATH)
 
 # Paramètres de chunking
 CHUNK_SIZE = int(getattr(config, "CHUNK_SIZE", 500))

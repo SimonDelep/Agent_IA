@@ -68,7 +68,7 @@ Une API FastAPI expose ces données et les actions métier (annulation, retours,
 cd Serveur_MCP
 pip install -r requirements.txt
 python database/seed_database.py
-uvicorn api.main:app --reload --port 8000
+uvicorn api.main:app --reload --port 8001
 ```
 
 Documentation : [api/README.md](../api/README.md)
