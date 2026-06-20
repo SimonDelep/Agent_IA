@@ -120,3 +120,10 @@ Question utilisateur
 ## RAG Azure AI Search — optionnel
 
 Pour un index cloud au lieu de ChromaDB, utilisez `Rag_project/ingest_azure.py` et adaptez `single_agent/rag_tool.py` pour importer `retrieve_azure` au lieu de `retrieve`. Par défaut, l'agent utilise **ChromaDB local**.
+
+## Voir aussi — multi_agent/
+
+Pour une architecture supervisor avec observabilité et sécurité renforcée, voir [`multi_agent/README.md`](../multi_agent/README.md) :
+
+- **Guardrail anti prompt-injection** sur l'entrée Streamlit (`GUARDRAIL_ENABLED`, `GUARDRAIL_BLOCK_MODE`)
+- **Traces LangSmith auditables** : runs agents (`nordtrail.agent.*`), outils (`nordtrail.tool.*`), tags `guardrail:*` et metadata de corrélation

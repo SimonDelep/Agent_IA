@@ -10,6 +10,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import AzureChatOpenAI
 from langgraph.graph import END, START, StateGraph
 from langgraph.prebuilt import create_react_agent
+from langsmith import traceable
 from mcp import ClientSession
 from pydantic import BaseModel, Field
 
@@ -65,9 +66,17 @@ async def build_supervisor_graph(session: ClientSession):
     """
     llm = get_llm()
 
-    service_tools = await build_mcp_tools(session, config.SERVICE_CLIENT_TOOLS)
-    product_tools = await build_mcp_tools(session, config.PRODUCT_EXPERT_TOOLS)
-    document_tools = [build_rag_tool()]
+    service_tools = await build_mcp_tools(
+        session,
+        config.SERVICE_CLIENT_TOOLS,
+        agent_name=config.AGENT_SERVICE_CLIENT,
+    )
+    product_tools = await build_mcp_tools(
+        session,
+        config.PRODUCT_EXPERT_TOOLS,
+        agent_name=config.AGENT_PRODUCT_EXPERT,
+    )
+    document_tools = [build_rag_tool(agent_name=config.AGENT_DOCUMENT)]
 
     service_client_agent = create_react_agent(
         llm,
@@ -98,6 +107,7 @@ async def build_supervisor_graph(session: ClientSession):
             return raw
         return SupervisorRoute.model_validate(raw)
 
+    @traceable(name="nordtrail.agent.supervisor", run_type="chain")
     def supervisor_node(state: AgentState) -> dict:
         turns = state.get("supervisor_turns", 0) + 1
         visited = list(state.get("agents_visited") or [])
@@ -135,6 +145,7 @@ async def build_supervisor_graph(session: ClientSession):
             "agents_visited": updated_visited,
         }
 
+    @traceable(name="nordtrail.agent.finalize", run_type="chain")
     def finalize_node(state: AgentState) -> dict:
         messages = [
             SystemMessage(content=FINALIZE_PROMPT),

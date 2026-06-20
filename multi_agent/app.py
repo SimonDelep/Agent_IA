@@ -20,6 +20,10 @@ from multi_agent import config  # noqa: F401 — bootstrap LangSmith avant LangC
 import streamlit as st
 
 from multi_agent.runner import run_multi_agent_chat
+from multi_agent.security.guardrails import (
+    evaluate_user_input_guardrail,
+    guardrail_user_message,
+)
 from multi_agent.tracing.langsmith import setup_tracing
 
 setup_tracing()
@@ -64,10 +68,27 @@ for message in st.session_state.messages:
 
 if prompt := st.chat_input("Posez votre question…"):
     st.session_state.messages.append({"role": "user", "content": prompt})
+    decision = evaluate_user_input_guardrail(prompt)
 
     with st.spinner("Les agents traitent votre demande…"):
         try:
-            answer = run_multi_agent_chat(st.session_state.messages)
+            if not decision.allow:
+                if config.GUARDRAIL_BLOCK_MODE == "hard":
+                    answer = guardrail_user_message()
+                else:
+                    answer = run_multi_agent_chat(
+                        st.session_state.messages,
+                        guardrail_verdict="blocked_soft",
+                        guardrail_reason=decision.reason,
+                        guardrail_rule=decision.matched_rule,
+                    )
+            else:
+                answer = run_multi_agent_chat(
+                    st.session_state.messages,
+                    guardrail_verdict="allow",
+                    guardrail_reason=decision.reason,
+                    guardrail_rule=decision.matched_rule,
+                )
             st.session_state.messages.append({"role": "assistant", "content": answer})
         except Exception as exc:
             st.session_state.messages.append(

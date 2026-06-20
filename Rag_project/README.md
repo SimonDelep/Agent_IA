@@ -231,7 +231,9 @@ single_agent.main / multi_agent.main
     → mcp_client.py → API FastAPI :8001
 ```
 
-Voir [`single_agent/README.md`](../single_agent/README.md) et [`multi_agent/README.md`](../multi_agent/README.md) pour le démarrage complet.
+Dans [`multi_agent/`](../multi_agent/), l'appel RAG est tracé dans LangSmith sous le span `nordtrail.tool.search_company_documents` (`run_type: tool`), avec l'agent propriétaire (`tool_agent: document`) et, si `AUDIT_VERBOSE_TRACING=true`, la requête tronquée dans les inputs redacted.
+
+Voir [`single_agent/README.md`](../single_agent/README.md) et [`multi_agent/README.md`](../multi_agent/README.md) pour le démarrage complet, le guardrail d'entrée et la configuration LangSmith.
 
 ---
 

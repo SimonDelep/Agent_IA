@@ -48,11 +48,14 @@ def _extract_response(messages: list) -> str:
     return "Aucune réponse générée."
 
 
-@traceable(name="nordtrail_multi_agent_run", run_type="chain")
+@traceable(name="nordtrail.multi_agent.run", run_type="chain")
 async def run_multi_agent_async(
     user_question: str,
     *,
     chat_history: list[ChatTurn] | None = None,
+    guardrail_verdict: str = "unknown",
+    guardrail_reason: str = "not_evaluated",
+    guardrail_rule: str | None = None,
 ) -> str:
     """Exécute le graphe supervisor avec une session MCP partagée."""
     question_hash = hashlib.sha256(user_question.encode()).hexdigest()[:12]
@@ -77,8 +80,16 @@ async def run_multi_agent_async(
                 "metadata": {
                     "agent_system": "multi_agent",
                     "user_question_hash": question_hash,
+                    "guardrail_verdict": guardrail_verdict,
+                    "guardrail_reason": guardrail_reason,
+                    "guardrail_rule": guardrail_rule or "",
                 },
-                "tags": ["nordtrail", "multi-agent", "supervisor"],
+                "tags": [
+                    "nordtrail",
+                    "system:multi_agent",
+                    "workflow:supervisor",
+                    f"guardrail:{guardrail_verdict}",
+                ],
             },
         )
 
@@ -92,7 +103,13 @@ def run_multi_agent(user_question: str) -> str:
     return asyncio.run(run_multi_agent_async(user_question))
 
 
-def run_multi_agent_chat(chat_history: list[ChatTurn]) -> str:
+def run_multi_agent_chat(
+    chat_history: list[ChatTurn],
+    *,
+    guardrail_verdict: str = "unknown",
+    guardrail_reason: str = "not_evaluated",
+    guardrail_rule: str | None = None,
+) -> str:
     """Point d'entrée synchrone pour l'interface conversationnelle Streamlit."""
     import asyncio
 
@@ -102,5 +119,11 @@ def run_multi_agent_chat(chat_history: list[ChatTurn]) -> str:
 
     latest_question = user_messages[-1]["content"]
     return asyncio.run(
-        run_multi_agent_async(latest_question, chat_history=chat_history)
+        run_multi_agent_async(
+            latest_question,
+            chat_history=chat_history,
+            guardrail_verdict=guardrail_verdict,
+            guardrail_reason=guardrail_reason,
+            guardrail_rule=guardrail_rule,
+        )
     )

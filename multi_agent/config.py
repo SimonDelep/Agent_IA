@@ -35,6 +35,11 @@ LANGCHAIN_TRACING_V2 = os.getenv("LANGCHAIN_TRACING_V2", "false").lower() == "tr
 LANGCHAIN_ENDPOINT = os.getenv("LANGCHAIN_ENDPOINT", "https://api.smith.langchain.com")
 LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
 LANGCHAIN_PROJECT = os.getenv("LANGCHAIN_PROJECT", "nordtrail-multi-agent")
+AUDIT_VERBOSE_TRACING = os.getenv("AUDIT_VERBOSE_TRACING", "false").lower() == "true"
+
+# Guardrail anti prompt-injection (entrée utilisateur)
+GUARDRAIL_ENABLED = os.getenv("GUARDRAIL_ENABLED", "true").lower() == "true"
+GUARDRAIL_BLOCK_MODE = os.getenv("GUARDRAIL_BLOCK_MODE", "hard").strip().lower()
 
 # Noms des nœuds / agents
 AGENT_SERVICE_CLIENT = "service_client"
